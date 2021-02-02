@@ -2,7 +2,7 @@
     <body>
         <h1 align="center">MySQL</h1>
         <h2>目录</h2><br/>
-        [<h3>1. 简介</h3><br/>](#introduce)
+        [1. 简介](#introduce)
         <span>1.1 mysql架构</span><br/>
         <h3>1.1.1 连接管理与安全性</h3><br/>
         # introduce
