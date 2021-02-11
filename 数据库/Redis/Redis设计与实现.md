@@ -31,14 +31,14 @@ Redis没有使用C语言传统的字符串（以空字符结尾的字符数组�
 
 2.1 SDS的定义<br>
 每个sds.h/sdshdr结构表示一个SDS的值：<br>
-`struct sdshdr {
-    // 记录buf数组中已经使用字节的数量
-    // 等于SDS所保存字符串的长度
-    int len;
-    // 记录buf数组中未使用字节的数量
-    int free;
-    // 字节数组，用于保存字符串
-    car buf[];
+`struct sdshdr {<br>
+    // 记录buf数组中已经使用字节的数量<br>
+    // 等于SDS所保存字符串的长度<br>
+    int len;<br>
+    // 记录buf数组中未使用字节的数量<br>
+    int free;<br>
+    // 字节数组，用于保存字符串<br>
+    car buf[];<br>
 }`<br>
 示例：<br>
 将Redis字符串使用SDS保存，则：<br>
