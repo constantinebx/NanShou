@@ -31,7 +31,8 @@ Redis没有使用C语言传统的字符串（以空字符结尾的字符数组�
 
 2.1 SDS的定义<br>
 每个sds.h/sdshdr结构表示一个SDS的值：<br>
-`struct sdshdr {<br>
+```C
+struct sdshdr {<br>
     // 记录buf数组中已经使用字节的数量<br>
     // 等于SDS所保存字符串的长度<br>
     int len;<br>
@@ -39,7 +40,8 @@ Redis没有使用C语言传统的字符串（以空字符结尾的字符数组�
     int free;<br>
     // 字节数组，用于保存字符串<br>
     car buf[];<br>
-}`<br>
+}
+```
 示例：<br>
 将Redis字符串使用SDS保存，则：<br>
 free属性的值为0，表示这个SDS没有分配任何未使用空间；<br>
@@ -88,23 +90,27 @@ SDS的API都是二进制安全的，所有SDS API都会以处理二进制的方�
 链表被广泛用于实现Redis各种功能，比如列表键、发布与订阅、慢查询、监视器等。<br>
 3.1 链表和链表节点的实现<br>
 每个链表节点使用一个adlist.h/listNode结构来表示：<br>
-`typedef struct listNode {
+```C
+typedef struct listNode {
     // 前置节点
     struct listNode * prev;
     // 后置节点
     struct listNode * next;
     // 节点的值
     void * value;
-}listNode;`<br>
+}listNode;
+```
 虽然仅仅使用多个listNode结构就可以组成链表，但使用adlist.h/list来持有链表的话，操作起来会更方便：<br>
-`typedef struct list {<br>
+```C
+typedef struct list {
     listNode * head;
     listNode * tail;
     unsigned long len;
     void * (*dup) (void *ptr);
     void * (*free) (void *ptr);
     int (*match) (void *ptr,void *key);
-} list;`<br>
+} list;
+```
 list结构为链表提供了表头指针head、表尾指针tail，以及链表长度计数器len，而dup、free和match成员则是用于实现多态链表所需的类型特定函数：<br>
 dup函数用于复制链表节点所保存的值；<br>
 free函数用于释放链表节点所保存的值；<br>
@@ -122,7 +128,8 @@ Redis的链表实现的特性可以总结如下：<br>
 Redis使用哈希表作为底层实现，一个哈希表里面可以有多个哈希表节点，而每个哈希表节点就保存了字典中的一个键值对。<br>
 4.1.1 哈希表<br>
 Redis字典所使用的哈希表由dict.h/dictht结构定义：<br>
-`typedef struct dictht {
+```C
+typedef struct dictht {
     // 哈希表数组
     dictEntry **table;
     // 哈希表大小
@@ -131,12 +138,14 @@ Redis字典所使用的哈希表由dict.h/dictht结构定义：<br>
     unsigned long sizemask;
     // 该哈希表已有节点的数量
     unsigned long used;
-} dictht;`<br>
+} dictht;
+```
 table属性是一个数组，数组中的每一个元素都是指向dict.h/dictEntry结构的指针，每个dictEntry结构保存着一个键值对。<br>
 
 4.1.2 哈希表节点<br>
 哈希表节点使用dictEntry结构表示，每个dictEntry结构都保存着一个键值对：<br>
-`typedef struct dictEntry {
+```C
+typedef struct dictEntry {
     // 键
     void *key;
     // 值
@@ -147,14 +156,15 @@ table属性是一个数组，数组中的每一个元素都是指向dict.h/dictE
     } v;
     // 指向下一个哈希表节点，形成链表
     struct dictEntry *next;
-} dictEntry;`<br>
+} dictEntry;
+```
 key属性保存着键值对中的键；<br>
 v属性保存着键值对中的值，其中键值对的值可以是一个指针，或者是一个uint64_t整数，又或者可以是一个int64_t整数；<br>
 next属性是指向另一个哈希表节点的指针，这个指针可以将多个哈希值相同的键值对连接在一起，以此来解决键冲突的问题。
 
 4.1.3 字典<br>
 Redis中的字典由dict.h/dict结构表示：<br>
-`typedef struct dict {
+```Ctypedef struct dict {
     // 类型特定函数
     dictType *type;
     // 私有数据
@@ -164,10 +174,12 @@ Redis中的字典由dict.h/dict结构表示：<br>
     // rehash索引
     // 当rehash不在进行时，值为-1
     int trehashidx;
-} dict;`<br>
+} dict;
+```
 type属性是一个指向dictType结构的指针，每个dictType结构保存了一簇用于操作特定类型键值对的函数，Redis会为用途不同的字典设置不同类型特定函数。<br>
 privdata属性则保存了需要传给那些类型特定函数的可选参数。<br>
-`typedef struct dictType {
+```C
+typedef struct dictType {
     // 计算哈希值的函数
     unsigned int (*hashFunction) (const void *key);
     // 复制键的函数
@@ -180,7 +192,8 @@ privdata属性则保存了需要传给那些类型特定函数的可选参数。
     void (*keyDestructor) (void privdata, void *key);
     // 销毁值的函数
     void (*valDestructor) (void *privdata, void *obj);
-} dictType;`<br>
+} dictType;
+```
 ht属性是一个包含两个项的数组，数组中的每个项都是一个dictht哈希表，一般情况下，字典只使用ht[0]表，ht[1]表只会在ht[0]进行rehash时使用。<br>
 rehashidx记录了rehash目前的进度，如果目前没有在进行rehash，那么他的值为-1。
 
