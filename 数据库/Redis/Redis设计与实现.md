@@ -380,7 +380,9 @@ Redis中的每个对象都由一个redisObject结构表示：
 |REDIS_ENCODING_ZIPLIST|压缩列表|
 |REDIS_ENCODING_INTSET|整数集合|
 |REDIS_ENCODING_SKIPLIST|跳表|
+
 每种类型的底层实现都至少使用了两种不同的编码，就是说同样的类型有不同的底层实现？不同类型的编码的对象：
+
 |类型|编码|对象|
 |-|-|-|
 |REDIS_STRING|REDIS_ENCODING_INT|使用整数值实现的字符串对象|
