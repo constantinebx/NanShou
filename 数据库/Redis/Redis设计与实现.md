@@ -380,6 +380,20 @@ Redis中的每个对象都由一个redisObject结构表示：
 |REDIS_ENCODING_ZIPLIST|压缩列表|
 |REDIS_ENCODING_INTSET|整数集合|
 |REDIS_ENCODING_SKIPLIST|跳表|
+每种类型的底层实现都至少使用了两种不同的编码，就是说同样的类型有不同的底层实现？不同类型的编码的对象：
+|类型|编码|对象|
+|-|-|-|
+|REDIS_STRING|REDIS_ENCODING_INT|使用整数值实现的字符串对象|
+|REDIS_STRING|REDIS_ENCODING_EMBSTR|使用embstr编码的简单动态字符串实现的字符串对象|
+|REDIS_STRING|REDIS_ENCODING_RAW|使用简单动态字符串实现的字符串对象|
+|REDIS_LIST|REDIS_ENCODING_ZIPLIST|使用压缩列表实现的列表对象|
+|REDIS_LIST|REDIS_ENCODING_LINKEDLIST|使用双端链表实现的列表对象|
+|REDIS_HASH|REDIS_ENCODING_ZIPLIST|使用压缩列表实现的哈希对象|
+|REDIS_HASH|REDIS_ENCODING_HT|使用字典实现的哈希对象|
+|REDIS_SET|REDIS_ENCODING_INTSET|使用整数集合实现的集合对象|
+|REDIS_SET|REDIS_ENCODING_HT|使用字典实现的集合对象|
+|REDIS_ZSET|REDIS_ENCODING_ZIPLIST|使用压缩列表实现的有序集合对象|
+|REDIS_ZSET|REDIS_ENCODING_SKIPLIST|使用跳跃表实现的有序集合对象|
 
 
 ### 第九章 数据库
