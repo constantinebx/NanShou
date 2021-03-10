@@ -340,3 +340,45 @@ contents虽然是int8_t类型，但实际上数组并不保存int8_t类型的值
 #### 7.1 压缩列表的构成
 压缩列表是Redis为了节约内存而开发的，是由一系列特殊编码的连续内存块组成的顺序型数据结构。一个压缩列表可以包含任意多个节点，每个节点可以保存一个字节
 数组或者一个整数值。
+
+### 第八章 对象
+Redis并没有直接使用SDS、双端链表、字典、压缩列表、整数集合等数据结构，而是基于这些数据结构，创建了一个对象系统，这个系统包含字符串对象、列表对象、
+哈希对象、集合对象、有序集合对象。
+
+#### 8.1 对象的类型和编码
+Redis使用对象来表示数据库中的键和值，每次当我们在Redis的数据库中新创建一个键值对时，我们至少会创建两个对象，一个对象用作键值对的键（键对象），一个
+对象用作键值对的值（值对象）。
+Redis中的每个对象都由一个redisObject结构表示：
+```C
+    typedef struct redisObject {
+        // 类型
+        unsigned type:4;
+        // 编码
+        unsigned encoding:4;
+        // 指向底层实现数据结构的指针
+        void *ptr;
+        // ...
+    } robj;
+```
+
+##### 8.1.1 类型
+对象的type属性记录了对象的类型，他的值可以是REDIS_STRING、REDIS_LIST、REDIS_HASH、REDIS_SET、REDIS_ZSET.
+对于Redis保存的键值对来说，键总是一个字符串对象，而值可以是其他对象。因此：
+当我们称呼一个数据库键为“字符串键”时，我们指的是，这个数据库键所对应的值为字符串对象；
+当我们称呼一个数据库键位“列表键”时，我们指的是，这个数据库键所对应的值为列表对象；
+以此类推。
+
+##### 8.1.2 编码和底层实现
+对象的ptr指针指向对象的底层实现数据结构，而这些数据结构由对象的encoding属性决定。对象的编码：
+编码常量|编码所对应的底层数据结构
+REDIS_ENCODING_INT|long类型的整数
+REDIS_ENCODING_EMBSTR|embstr编码的简单动态字符串
+REDIS_ENCODING_RAW|简单动态字符串
+REDIS_ENCODING_HT|字典
+REDIS_ENCODING_LINKEDLIST|双端链表
+REDIS_ENCODING_ZIPLIST|压缩列表
+REDIS_ENCODING_INTSET|整数集合
+REDIS_ENCODING_SKIPLIST|跳表
+
+
+### 第九章 数据库
