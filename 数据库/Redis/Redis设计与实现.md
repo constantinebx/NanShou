@@ -370,15 +370,16 @@ Redis中的每个对象都由一个redisObject结构表示：
 
 ##### 8.1.2 编码和底层实现
 对象的ptr指针指向对象的底层实现数据结构，而这些数据结构由对象的encoding属性决定。对象的编码：
-编码常量|编码所对应的底层数据结构
-REDIS_ENCODING_INT|long类型的整数
-REDIS_ENCODING_EMBSTR|embstr编码的简单动态字符串
-REDIS_ENCODING_RAW|简单动态字符串
-REDIS_ENCODING_HT|字典
-REDIS_ENCODING_LINKEDLIST|双端链表
-REDIS_ENCODING_ZIPLIST|压缩列表
-REDIS_ENCODING_INTSET|整数集合
-REDIS_ENCODING_SKIPLIST|跳表
+|编码常量|编码所对应的底层数据结构|
+|-|-|
+|REDIS_ENCODING_INT|long类型的整数|
+|REDIS_ENCODING_EMBSTR|embstr编码的简单动态字符串|
+|REDIS_ENCODING_RAW|简单动态字符串|
+|REDIS_ENCODING_HT|字典|
+|REDIS_ENCODING_LINKEDLIST|双端链表|
+|REDIS_ENCODING_ZIPLIST|压缩列表|
+|REDIS_ENCODING_INTSET|整数集合|
+|REDIS_ENCODING_SKIPLIST|跳表|
 
 
 ### 第九章 数据库
