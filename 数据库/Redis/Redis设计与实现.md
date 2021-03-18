@@ -833,3 +833,24 @@ TYPE记录了value的类型，长度为1字节，值可以是以下的常量中�
 9、REDIS_RDB_TYPE_HASH_ZIPLIST  
 每个TYPE常量都代表了一种对象类型或者底层编码，当服务器读入RDB文件中的键值对时，会根据TYPE的值决定如何读入和解释value的数据。  
 key和value分别保存了键值对的键对象和值对象：  
+1、其中key总是一个字符串对象，它的编码方式和REDIS_RDB_TYPE_STRING类型的value一样。根据内容长度不同，key的长度不同。  
+2、根据TYPE类型不同，以及保存内容长度的不同，保存value的结构和长度也会不同。  
+带有过期时间的键值对在RDB文件中保存结构为：EXPIRETIME_MS、ms、TYPE、key、value。  
+EXPITETIME_MS常量的长度为1字节，它告知读入程序，接下来要读入的将是一个以毫秒为单位的过期时间。  
+ms是一个8字节长的带符号整数，记录着一个以毫秒为单位的UNIX时间戳，这个时间戳就是键值对的过期时间。  
+
+##### 10.3.3 value的编码
+类型编码参见第八章
+1、字符串对象
+TYPE值为REDIS_RDB_TYPE_STRING，那么value保存的是字符串，字符串对象的编码格式可一个REDIS_ENCONDING_INT或者REDIS_ENCODING_RAW。  
+如果字符串对象的编码是REDIS_ENCODING_INT，那么说明对象中保存的是长度不超过32位的整数。这种编码将以ENCODING、integer的结构保存。  
+其中ENCODING的值可以是REDIS_RDB_INT8、REDIS_RDB_INT16、REDIS_RDB_INT32之一，它们代表用8位、16位、32位来保存整数值integer。  
+如果字符串编码为REDIS_ENCODING_RAW，说明对象所保存的是字符串，根据字符串长度不同，有压缩和不压缩两种方式来保存：  
+1）如果字符串的长度小于20字节，那么字符串被原样保存。  
+2）如果字符串长度大于20字节，那么字符串被压缩保存。  
+注意：以上两个条件是在假设服务器打开了RDB文件压缩功能的情况下进行的，如果服务器关闭了RDB文件压缩功能，那么RDB程序总以无压缩的
+方式保存字符串值。  
+对于未被压缩的字符串将以len、string的结构来保存。其中len保存字符串的长度，string保存字符串本身。  
+对于压缩后的字符串，将以REDIS_RDB_ENC_LZF、compressed_len、origin_len、compressed_string结构保存。  
+其中REDIS_RDB_ENC_LZF常量标志着字符串已经被LZF算法压缩过了，程序碰到这个常量后，会对字符串进行解压缩。  
+compressed_len记录的是字符串压缩之后的长度，origin记录的是字符串原来的长度，compressed_string记录的是被压缩的字符串。  
