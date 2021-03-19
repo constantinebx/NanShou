@@ -840,8 +840,8 @@ EXPITETIME_MS常量的长度为1字节，它告知读入程序，接下来要读
 ms是一个8字节长的带符号整数，记录着一个以毫秒为单位的UNIX时间戳，这个时间戳就是键值对的过期时间。  
 
 ##### 10.3.3 value的编码
-类型编码参见第八章
-1、字符串对象
+类型编码参见第八章  
+1、字符串对象  
 TYPE值为REDIS_RDB_TYPE_STRING，那么value保存的是字符串，字符串对象的编码格式可一个REDIS_ENCONDING_INT或者REDIS_ENCODING_RAW。  
 如果字符串对象的编码是REDIS_ENCODING_INT，那么说明对象中保存的是长度不超过32位的整数。这种编码将以ENCODING、integer的结构保存。  
 其中ENCODING的值可以是REDIS_RDB_INT8、REDIS_RDB_INT16、REDIS_RDB_INT32之一，它们代表用8位、16位、32位来保存整数值integer。  
@@ -854,3 +854,8 @@ TYPE值为REDIS_RDB_TYPE_STRING，那么value保存的是字符串，字符串�
 对于压缩后的字符串，将以REDIS_RDB_ENC_LZF、compressed_len、origin_len、compressed_string结构保存。  
 其中REDIS_RDB_ENC_LZF常量标志着字符串已经被LZF算法压缩过了，程序碰到这个常量后，会对字符串进行解压缩。  
 compressed_len记录的是字符串压缩之后的长度，origin记录的是字符串原来的长度，compressed_string记录的是被压缩的字符串。  
+2、列表对象  
+如果TYPE的值为REDIS_RDB_TYPE_LIST，那么value保存的就是一个REDIS_ENCODING_LINKEDLIST编码的列表对象，RDB文件保存
+的结构为：list_length、item1、item2、item3...  
+list_length记录了列表的长度，表示列表保存了多少项（item）。而每个item都是一个字符串对象。  
+3、集合对象  
