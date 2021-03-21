@@ -859,3 +859,23 @@ compressed_len记录的是字符串压缩之后的长度，origin记录的是字
 的结构为：list_length、item1、item2、item3...  
 list_length记录了列表的长度，表示列表保存了多少项（item）。而每个item都是一个字符串对象。  
 3、集合对象  
+如果TYPE的值为REDIS_RDB_TYPE_SET，那么value保存的就是一个REDIS_ENCODING_HT编码的集合对象，RDB文件保存这种对象的结构
+为set_size、elem1、elem2...
+其中，set_size是集合的大小，记录了集合保存了多少元素，读入程序可以通过这个大小知道自己应该读入多少个集合元素。  
+4、哈希表对象  
+如果TYPE的值为REDIS_RDB_TYPE_HASH，那么value保存的就是一个REDIS_ENCODING_HT编码的集合对象，RDB文件结构为
+hash_size、key_value_pair1、key_value_pair2...  
+5、有序集合对象  
+如果TYPE的值为REDIS_RDB_TYPE_ZSET，那么value保存的就是一个REDIS_ENCODING_SKIPLIST编码的有序集合，RDB文件保存
+的结构为sorted_set_size、elem1、elem2...  
+6、INTSET编码的集合  
+如果TYPE的值为REDIS_RDB_TYPE_INTSET，那么value保存的就是一个整数集合对象，RDB保存这种对象的方法是，先将整数集合转换为
+字符串对象，然后将这个字符串保存到RDB文件里面。  
+如果程序在读入RDB文件的过程中 ，碰到由整数集合对象转换成的字符串对象，，会根据TYPE值的指示，先读入字符串对象，再将字符串
+转换为原来的整数集合对象。  
+7、ZIPLIST编码的列表、哈希表或者有序集合  
+如果TYPE的值为REDIS_RDB_TYPE_LIST_ZIPLIST、REDIS_RDB_TYPE_HASH_ZIPLIST、REDIS_RDB_TYPE_ZSEP_ZIPLIST，value
+保存的就是一个压缩列表对象，RDB文件中保存的结构方法是：  
+将压缩列表保存转换成一个字符串对象，将字符串对象保存到RDB文件中。解析则反过来。  
+
+#### 10.4 分析RDB文件  
